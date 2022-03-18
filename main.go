@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bytes"
+	"Emm/application"
 	"fmt"
-	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func main() {
@@ -15,59 +14,39 @@ func main() {
 		fmt.Println("This path is unreached")
 		return
 	}
+	if len(os.Args) < 2 {
+		fmt.Println("lack argument: path")
+		return
+	}
 	wantedPath := os.Args[1]
-	path := currentPath + string(os.PathSeparator) + wantedPath
+	var path string
+	if filepath.IsAbs(wantedPath) {
+		path = wantedPath
+	} else {
+		path = currentPath + string(os.PathSeparator) + wantedPath
+	}
 	_, err = os.Stat(path)
 	if err != nil {
 		fmt.Println("Unknown Path")
 		return
 	}
-	files, _ := GetFiles(path)
+	files, _ := application.GetFiles(path)
+
+	result := make(map[string]application.FileDesc)
 	for _, file := range files {
-		fmt.Println(file)
-	}
-}
-
-type FileDesc struct {
-	name string
-	line int
-}
-
-// GetFiles path must exist and legal
-func GetFiles(path string) ([]FileDesc, error) {
-	var files []FileDesc
-	filepath.Walk(path, func(path string, info fs.FileInfo, err error) error {
-
-		if !info.IsDir() {
-			f, _ := os.Open(path)
-			line, _ := CountFileLine(f)
-			f.Close()
-
-			files = append(files, FileDesc{
-				name: info.Name(),
-				line: line,
-			})
-		}
-		return nil
-	})
-	return files, nil
-}
-
-func CountFileLine(read io.Reader) (int, error) {
-	buf := make([]byte, 32*1024)
-	count := 0
-	lineSep := []byte{'\n'}
-
-	for {
-		c, err := read.Read(buf)
-		count += bytes.Count(buf[:c], lineSep)
-
-		switch {
-		case err == io.EOF:
-			return count, nil
-
-		case err != nil:
-			return count, err
+		arr := strings.Split(file.Name, ".")
+		suffix := arr[len(arr)-1]
+		desc, contains := result[suffix]
+		if contains {
+			desc.Blank += file.Blank
+			desc.Line += file.Line
+		} else {
+			result[suffix] = application.FileDesc{
+				Name:  suffix,
+				Line:  file.Line,
+				Blank: file.Blank,
+			}
 		}
 	}
+	fmt.Println(result)
 }
