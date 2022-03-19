@@ -1,3 +1,3 @@
 # Pot
 
-use `pot path to count directory`
+use `pot path` to count directory
