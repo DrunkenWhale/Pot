@@ -7,7 +7,7 @@ line_sep = "=" * 116
 
 def format_print():
     desc_list = list(files_map.values())
-    desc_list.sort(key=lambda x: x.line)
+    desc_list.sort(key=lambda x: x.line, reverse=True)
     print(line_sep)
     print(string_format % ("Type", "File", "Line", "Blank", "Code"))
     print(line_sep)
