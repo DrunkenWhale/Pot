@@ -28,7 +28,7 @@ def generate(path):
                 line = len(content_list)
                 blank = (content_list.count(b'\r\n'))
                 if not files_map.__contains__(type_name):
-                    files_map[type_name] = TypeDesc(0, lanuage_map[type_name], line, blank)
+                    files_map[type_name] = TypeDesc(1, lanuage_map[type_name], line, blank)
                 else:
                     desc = files_map[type_name]
                     desc.file_number += 1

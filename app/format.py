@@ -9,7 +9,7 @@ def format_print():
     desc_list = list(files_map.values())
     desc_list.sort(key=lambda x: x.line, reverse=True)
     print(line_sep)
-    print(string_format % ("Type", "File", "Line", "Blank", "Code"))
+    print(string_format % ("Type", "File", "Code", "Blank", "Line"))
     print(line_sep)
     file_number = 0
     line = 0
